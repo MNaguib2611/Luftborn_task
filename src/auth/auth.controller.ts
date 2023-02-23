@@ -27,7 +27,7 @@ export class AuthController {
 
   @Post('/register')
   @UsePipes(ValidationPipe)
-  register(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  register(@Body() authCredentialsDto: AuthCredentialsDto): Promise<any> {
     return this.authService.register(authCredentialsDto);
   }
 

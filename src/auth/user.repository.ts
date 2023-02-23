@@ -19,18 +19,19 @@ export class UserRepository extends Repository<User> {
   async register(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     this.logger.log('Inside register method');
     const { username, password } = authCredentialsDto;
+    const userFromDatabase = await this.findOneBy({ username });
+    if (userFromDatabase) {
+      throw new ConflictException('User already exists');
+    }
     const user = this.create();
     user.salt = await bcrypt.genSalt();
     user.username = username;
+
     user.password = await this.hashPassword(password, user.salt);
     try {
       await user.save();
     } catch (error) {
-      if (error.code === '23505') {
-        throw new ConflictException('User already exists');
-      } else {
-        throw new InternalServerErrorException('Something went Wrong');
-      }
+      throw new InternalServerErrorException('Something went Wrong');
     }
   }
 
